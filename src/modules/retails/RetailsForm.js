@@ -23,7 +23,8 @@ class Retails extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      input: null
+      input: null,
+      value: '$1-$100'
     }
   }
 
@@ -31,14 +32,9 @@ class Retails extends Component {
     this.redirect('peopleListStack')
   }
 
-  prod = () => {
-    this.redirect('peopleListStack')
-  }
-
   redirect(route){
     this.props.navigation.navigate(route)
   }
-
 
   render() {
     return (
@@ -52,23 +48,16 @@ class Retails extends Component {
         }}
         showsVerticalScrollIndicator={false}
         >
-        <View>
-          <Text style={{color: 'black', marginLeft: 20, marginBottom: -10, marginTop: 20 }}>Category</Text>
-          <TextInput
-            style={[BasicStyles.formControls, {marginLeft: 20, width: '90%' }]}
-            // onChangeText={(input) => this.setInput(input)}
-            value={this.state.input}
-            placeholder={'Categories'}
-            onClick={() => this.redirect('peopleListStack')}
-          />
-          <InputSelect style={{width: '100%'}} routeTo={() => this.prod()} placeholder={'Product Type'} title={'Product Type'} />
-          <InputSelect placeholder={'Style'} routeTo={() => this.prod()} title={'Style'} />
-          <InputSelect placeholder={'Brand'} routeTo={() => this.prod()} title={'Brand'} />
-          <InputSelect placeholder={'Size'} routeTo={() => this.prod()} title={'Size'} />
-          <InputSelect placeholder={'Body Fit'} routeTo={() => this.prod()} title={'Body Fit'} />
-          <InputSelect placeholder={'Colour'} routeTo={() => this.prod()} title={'Colour'} />
+        <View style={{marginTop: 20}}>
+          <InputSelect style={{width: '100%'}} title={'Category'} titles={'category'} />
+          <InputSelect style={{width: '100%'}} placeholder={'Product Type'} title={'Product Type'} titles={'Product Type'} />
+          <InputSelect placeholder={'Style'} title={'Style'} titles={'style'}/>
+          <InputSelect placeholder={'Brand'} title={'Brand'} titles={'brand'}/>
+          <InputSelect placeholder={'Size'} title={'Size'} titles={'size'} />
+          <InputSelect placeholder={'Body Fit'} title={'Body Fit'} titles={'body fit'}/>
+          <InputSelect placeholder={'Colour'} title={'Colour'} titles={'colour'}/>
           <View style={{marginBottom: '23%'}}>
-            <Range placeholder={'$1-$100'} title={'Price Range'} />
+            <Range value={this.state.value.toString()} title={'Price Range'} />
           </View>
           <Text style={{marginLeft: 20, marginBottom: 5}}>People in this SYNQT</Text>
           {/* <FontAwesomeIcon

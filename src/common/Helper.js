@@ -1,7 +1,7 @@
 import React from 'react';
 import Color from './Color.js';
-import { faHome, faEnvelope, faUsers, faPalette, faShieldAlt, faHandshake, faShare } from '@fortawesome/free-solid-svg-icons';
-import { faComment } from '@fortawesome/free-regular-svg-icons';
+import { faHome, faEnvelope, faUsers, faPalette, faShieldAlt, faHandshake, faShare, faCopy, faShareAltSquare, faCog } from '@fortawesome/free-solid-svg-icons';
+import { faComment, faShareSquare } from '@fortawesome/free-regular-svg-icons';
 
 export default {
   company: 'Increment Technologies',
@@ -30,7 +30,7 @@ export default {
     {
       title: 'Messages',
       route: 'Messenger',
-      icon: faComment,
+      icon: faEnvelope,
       borderBottom: false
     },
     {
@@ -42,19 +42,19 @@ export default {
     {
       title: 'Theme Settings',
       route: 'Settings',
-      icon: faPalette,
+      icon: faCog,
       borderBottom: false
     },
     {
       title: 'Share Profile',
       route: 'share',
-      icon: faShare,
+      icon: faShareSquare,
       borderBottom: true
     },
     {
       title: 'Terms & Conditions',
       route: 'TermsAndConditions',
-      icon: faHandshake,
+      icon: faCopy,
       borderBottom: false
     },
     {
@@ -101,4 +101,36 @@ export default {
       return true;
     }
   },
+  cuisines: [
+    {
+      type: 'Filipino'
+    },
+    {
+      type: 'Chinese'
+    },
+    {
+      type: 'Japanese'
+    },
+    {
+      type: 'Indian'
+    },
+    {
+      type: 'Italian'
+    },
+    {
+      type: 'Thai'
+    },
+    {
+      type: 'Spanish'
+    },
+    {
+      type: 'French'
+    },
+    {
+      type: 'Korean'
+    },
+    {
+      type: 'Turkish'
+    }
+  ]
 };

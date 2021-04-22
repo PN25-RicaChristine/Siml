@@ -1,61 +1,170 @@
 import React, { Component } from 'react';
 import Style from './Style.js';
-import { View, Image, Text, TouchableOpacity, ScrollView, SafeAreaView, Dimensions} from 'react-native';
+import { View, Image, Text, TouchableOpacity, ScrollView, SafeAreaView, Dimensions } from 'react-native';
 import { Routes, Color, Helper, BasicStyles } from 'common';
 import Pagination from 'components/Pagination/Icons';
 import { Pager, PagerProvider } from '@crowdlinker/react-native-pager';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faBars, faUtensils, faChevronLeft, faTicketAlt, faShoppingBag} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faBars, faUtensils, faChevronLeft, faTicketAlt, faShoppingBag } from '@fortawesome/free-solid-svg-icons';
 import { connect } from 'react-redux';
 import ImageCardWithUser from 'modules/generic/ImageCardWithUser';
 import CardModal from 'modules/modal/Swipe.js';
+import Api from 'services/api';
+import { Spinner, Empty } from 'components';
+import _ from 'lodash';
+
 const height = Math.round(Dimensions.get('window').height);
-class TopChoice extends Component{
+class TopChoice extends Component {
   constructor(props) {
     super(props);
     this.state = {
       activeIndex: 0,
       data: [],
       isLoading: false,
-      isVisible: false
-    };   
+      isVisible: false,
+      item: null,
+      limit: 5,
+      offset: 0
+    };
   }
 
-  onPageChange(index){
+  onPageChange(index) {
     this.setState({
       activeIndex: index
     })
   }
 
-  renderData(data){
-    return(
+  componentDidMount() {
+    this.retrieve(false)
+  }
+
+  retrieve = (flag) => {
+    let parameter = {
+      condition: [{
+        value: this.props.navigation.state?.params?.synqt_id,
+        column: 'synqt_id',
+        clause: '='
+      }],
+      limit: this.state.limit,
+      offset: flag == true && this.state.offset > 0 ? (this.state.offset * this.state.limit) : this.state.offset
+    }
+    this.setState({ isLoading: true })
+    Api.request(Routes.topChoiceRetrieve, parameter, response => {
+      this.setState({ isLoading: false })
+      if (response.data.length > 0) {
+        this.setState({
+          data: flag == false ? response.data : _.uniqBy([...this.state.data, ...response.data], 'id'),
+          offset: flag == false ? 1 : (this.state.offset + 1)
+        })
+      } else {
+        this.setState({
+          data: flag == false ? [] : this.state.data,
+          offset: flag == false ? 0 : this.state.offset,
+        })
+      }
+    });
+  }
+
+  closeModal = (value) => {
+    if (value === null) {
+      this.setState({ isVisible: false })
+    } else {
+      let parameter = {
+        id: value
+      }
+      this.setState({ isLoading: true })
+      Api.request(Routes.topChoiceDelete, parameter, response => {
+        this.setState({ isLoading: false })
+        if (response.data !== null) {
+          this.setState({ isVisible: false })
+          this.retrieve(false)
+        }
+      });
+    }
+  }
+
+  renderData() {
+    return (
       <SafeAreaView>
         <ScrollView
           showsVerticalScrollIndicator={false}
-          >
+          onScroll={(event) => {
+            let scrollingHeight = event.nativeEvent.layoutMeasurement.height + event.nativeEvent.contentOffset.y
+            let totalHeight = event.nativeEvent.contentSize.height
+            if (event.nativeEvent.contentOffset.y <= 0) {
+              if (this.state.isLoading == false) {
+                // this.retrieve(false)
+              }
+            }
+            if (Math.round(scrollingHeight) >= Math.round(totalHeight)) {
+              if (this.state.isLoading === false) {
+                this.retrieve(true)
+              }
+            }
+          }}
+        >
           <View style={{
-            height: height,
-            marginTop: 50,
+            marginTop: 20,
             width: '90%',
             marginLeft: '5%',
             marginRight: '5%'
           }}>
             {
-              data.map((item, index) => (
+              this.state.data.length > 0 && this.state.data.map((item, index) => (
                 <ImageCardWithUser
-                  data={item} style={{
+                  data={{
+                    logo: item.merchant.logo,
+                    address: item.merchant.address || 'No address provided',
+                    name: item.merchant.name,
+                    date: item.synqt[0].date,
+                    superlike: true,
+                    users: [{
+                      account: {
+                        profile: {
+                          url: '/storage/image/11_2021-04-06_02_04_43_fries.jpg'
+                        }
+                      }
+                    }, {
+                      account: {
+                        profile: {
+                          url: '/storage/image/11_2021-04-06_02_04_43_fries.jpg'
+                        }
+                      }
+                    }, {
+                      account: {
+                        profile: {
+                          url: '/storage/image/11_2021-04-06_02_04_43_fries.jpg'
+                        }
+                      }
+                    }, {
+                      account: {
+                        profile: {
+                          url: '/storage/image/11_2021-04-06_02_04_43_fries.jpg'
+                        }
+                      }
+                    }, {
+                      account: {
+                        profile: {
+                          url: '/storage/image/11_2021-04-06_02_04_43_fries.jpg'
+                        }
+                      }
+                    }]
+                  }}
+                  style={{
                     marginBottom: 20
                   }}
-                  onClick={(item) => {
+                  onClick={() => {
                     this.setState({
-                      isVisible: true
+                      isVisible: true,
+                      item: item
                     })
                   }}
-                  />
+                />
               ))
             }
           </View>
         </ScrollView>
+        {this.state.data.length === 0 && (<Empty refresh={true} onRefresh={() => this.retrieve(false)} />)}
       </SafeAreaView>
     )
   }
@@ -72,56 +181,28 @@ class TopChoice extends Component{
         icon: faShoppingBag
       }
     ]
-
-    const data = [{
-      image: require('assets/test2.jpg'),
-      date: 'January 29, 2021',
-      location: 'Cebu City',
-      superlike: true,
-      users: [{
-        name: 'Test'
-      }, {
-        name: 'Test'
-      }]
-    }, {
-      image: require('assets/test.jpg'),
-      date: 'January 29, 2021',
-      location: 'Cebu City',
-      superlike: true,
-      users: [{
-        name: 'Test'
-      }]
-    }, {
-      image: require('assets/test.jpg'),
-      date: 'January 29, 2021',
-      location: 'Cebu City',
-      superlike: true,
-      users: [{
-        name: 'Test'
-      }]
-    }]
     return (
       <View style={[Style.MainContainer, {
         backgroundColor: Color.containerBackground
       }]}>
-        {data && this.renderData(data)}
-        {isVisible && <CardModal
+        {this.state.isLoading ? <Spinner mode="overlay" /> : null}
+        {this.state.data && this.renderData()}
+        <CardModal
           history={true}
+          item={this.state.item && this.state.item}
           navigation={this.props.navigation}
-          visisble={isVisible}
-          onClose={() => {
-          this.setState({
-            isVisible: false
-          })
-        }}/>}
+          visible={isVisible}
+          onClose={(value) => {
+            this.closeModal(value)
+          }} />
       </View>
     );
   }
 }
-const mapStateToProps = state => ({state: state});
+const mapStateToProps = state => ({ state: state });
 
 const mapDispatchToProps = dispatch => {
-  const {actions} = require('@redux');
+  const { actions } = require('@redux');
   return {};
 };
 

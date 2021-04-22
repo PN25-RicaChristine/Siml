@@ -81,10 +81,12 @@ class Cards extends React.Component {
       inventory_type: 'all'
     }
     this.setState({ isLoading: true })
-    Api.request(Routes.merchantsRetrieve, parameter, response => {
+    Api.request(Routes.productsRetrieve, parameter, response => {
       this.setState({ isLoading: false })
       if (response.data.length > 0) {
         this.setState({ products: response.data });
+      } else {
+        this.setState({ products: []})
       }
     },
       error => {
@@ -100,24 +102,36 @@ class Cards extends React.Component {
   }
 
   addToTopChoice = () => {
-    // let parameter = {
-    //   account_id: 1,
-    //   payload: 'merchant_id',
-    //   payload_value: 1,
-    //   category: 'restaurant'
-    // }
-    // this.setState({ isLoading: true })
-    // Api.request(Routes.merchantsRetrieve, parameter, response => {
-    //   this.setState({ isLoading: false })
-    //   if (response.data.length > 0) {
-        this.props.navigation.navigate('topChoiceStack');
-    //   }
-    // },
-    //   error => {
-    //     this.setState({ isLoading: false })
-    //     console.log({ error });
-    //   },
-    // );
+    let parameter = {
+      account_id: this.props.state.user.id,
+      payload: 'merchant_id',
+      payload_value: this.state.data[this.state.index].id,
+      category: 'restaurant',
+      synqt_id: this.props.navigation.state.params?.synqt_id && this.props.navigation.state.params?.synqt_id
+    }
+    this.setState({ isLoading: true })
+    Api.request(Routes.topChoiceCreate, parameter, response => {
+      this.setState({ isLoading: false })
+      if (response.data !== null) {
+        this.deleteFromNotification(this.props.id);
+      }
+    },
+      error => {
+        this.setState({ isLoading: false })
+        console.log({ error });
+      },
+    );
+  }
+
+  deleteFromNotification = (id) => {
+    let parameter = {
+      id: id
+    }
+    this.setState({ isLoading: true });
+    Api.request(Routes.notificationDelete, parameter, response => {
+      this.setState({ isLoading: false })
+      this.props.navigation.navigate('topChoiceStack', {synqt_id: this.props.navigation.state.params?.synqt_id});
+    });
   }
 
   renderCard = () => {
@@ -147,14 +161,14 @@ class Cards extends React.Component {
                       borderRadius: BasicStyles.standardBorderRadius,
                       backgroundColor: 'white'
                     }}
-                    source={{ uri: Config.BACKEND_URL + el.logo }}>
+                    source={el.logo ? { uri: Config.BACKEND_URL + el.logo } : require('assets/default.png')}>
                     <View style={{
                       position: 'absolute',
                       bottom: this.props.topFloatButton === true ? 100 : 15,
                       ...BasicStyles.standardWidth
                     }}>
-                      <Text style={{ color: Color.white, fontSize: BasicStyles.standardTitleFontSize, fontWeight: 'bold' }}>{el.name || 'No data'}</Text>
-                      <Text style={{ color: Color.white }}>{el.address || 'No address'}</Text>
+                      <Text style={{ color: el.logo ? Color.white : 'black', fontSize: BasicStyles.standardTitleFontSize, fontWeight: 'bold' }}>{el.name || 'No data'}</Text>
+                      <Text style={{ color: el.logo ? Color.white : 'black'}}>{el.address || 'No address'}</Text>
                     </View>
                     <View style={{ position: 'absolute', bottom: 20, right: 15, flexDirection: 'row' }}>
                       <FontAwesomeIcon
@@ -252,7 +266,18 @@ class Cards extends React.Component {
           </View>
           <View style={this.props.bottomFloatButton === true ? { marginBottom: 200 } : { marginBottom: 0 }}>
             {this.state.choice == 'Menu' ? (
-              <MenuCards data={this.state.products && this.state.products}/>
+              <View>
+              <MenuCards data={this.state.products.length > 0 && this.state.products}/>
+              {this.state.products.length === 0 && (
+                <View style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  paddingTop: 40
+                }}>
+                  <Text>No available product.</Text>
+                </View>
+              )}
+              </View>
             ) :
               <Information
                 name={this.state.data[this.state.index]?.name || 'No data'}
@@ -260,7 +285,8 @@ class Cards extends React.Component {
                 description={' is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s. It is simply dummy text of the printing and typesetting industry.'}
               />}
           </View>
-          {this.props.bottomFloatButton === true && (<FLoatingButton onClick={() => {this.addToTopChoice()}}></FLoatingButton>)}
+          {this.state.isLoading ? <Spinner mode="overlay" /> : null}
+          {this.props.bottomFloatButton === true > 0 && (<FLoatingButton onClick={() => {this.addToTopChoice()}}></FLoatingButton>)}
         </View>
       </View>
     )
@@ -279,7 +305,7 @@ class Cards extends React.Component {
             }
           }
           if (Math.round(scrollingHeight) >= Math.round(totalHeight)) {
-            if (isLoading == false) {
+            if (isLoading == false && this.state.choice === 'Menu') {
               this.retrieveProducts();
             }
           }

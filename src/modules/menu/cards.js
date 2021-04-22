@@ -6,50 +6,11 @@ import Config from 'src/config.js';
 class Cards extends Component{
   constructor(props){
     super(props);
-    this.state = {
-      data: [
-        {
-          title: 'Special Menu',
-          description: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s,',
-          price: 2.50
-        },
-        {
-          title: 'Special Menu',
-          description: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s,',
-          price: 2.50
-        },
-        {
-          title: 'Special Menu',
-          description: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s,',
-          price: 2.50
-        },
-        {
-          title: 'Special Menu',
-          description: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s,',
-          price: 2.50
-        },
-        {
-          title: 'Special Menu',
-          description: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s,',
-          price: 2.50
-        },
-        {
-          title: 'Special Menu',
-          description: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s,',
-          price: 2.50
-        },
-        {
-          title: 'Special Menu',
-          description: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s,',
-          price: 2.50
-        },
-        ]
-    }
   }
 
   render() {
     return (
-      this.state.data.map((u, i) => {
+      this.props.data && this.props.data.map((u, i) => {
       return (
         <View style={Style.Container}>
           <Image

@@ -1,16 +1,18 @@
 import { Color } from 'common';
 export default {
   container: {
-    flex: 1
+    flex: 1,
   },
   navItemStyle: {
-    padding: 10
+    padding: 10,
+    color:Color.white
   },
   navSectionStyle: {
     paddingTop: 5,
     paddingBottom: 5,
     borderBottomColor: Color.gray,
-    borderBottomWidth: 1
+    borderBottomWidth: 1,
+    // width: 200
   },
   navSectionStyleNoBorder: {
     paddingTop: 5,

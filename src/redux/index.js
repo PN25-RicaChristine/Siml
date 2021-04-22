@@ -16,6 +16,12 @@ const types = {
   UPDATE_MESSAGE_BY_CODE: 'UPDATE_MESSAGE_BY_CODE',
   UPDATE_MESSAGES_ON_GROUP_BY_PAYLOAD: 'UPDATE_MESSAGES_ON_GROUP_BY_PAYLOAD',
   SET_STATUS_SEARCH: 'SET_STATUS_SEARCH',
+  SET_CREATE_STATUS: 'SET_CREATE_STATUS',
+  SET_LOCATION: 'SET_LOCATION',
+  SET_DEVICE_LOCATION: 'SET_DEVICE_LOCATION',
+  SET_DEFAULT_ADDRESS: 'SET_DEFAULT_ADDRESS',
+  SET_TEMP_MEMBERS: 'SET_TEMP_MEMBERS',
+  SET_SHOW_SETTINGS: 'SET_SHOW_SETTINGS'
 };
 
 export const actions = {
@@ -60,6 +66,24 @@ export const actions = {
   },
   setStatusSearch(statusSearch) {
     return {type: types.SET_STATUS_SEARCH, statusSearch};
+  },
+  setCreateStatus(createStatus) {
+    return {type: types.SET_CREATE_STATUS, createStatus};
+  },
+  setLocation(location) {
+    return {type: types.SET_LOCATION, location};
+  },
+  setDeviceLocation(deviceLocation) {
+    return {type: types.SET_DEVICE_LOCATION};
+  },
+  setDefaultAddress(defaultAddress) {
+    return {type: types.SET_DEFAULT_ADDRESS, defaultAddress}
+  },
+  setTempMembers(tempMembers) {
+    return {type: types.SET_TEMP_MEMBERS, tempMembers}
+  },
+  setShowSettings(showSettings) {
+    return {type: types.SET_SHOW_SETTINGS, showSettings}
   }
 };
 
@@ -76,7 +100,13 @@ const initialState = {
     messages: null,
   },
   unReadMessages: [],
-  statusSearch: null
+  statusSearch: null,
+  createStatus: false,
+  location: null,
+  deviceLocation: null,
+  defaultAddress: null,
+  tempMembers: [],
+  showSettings: false
 };
 
 storeData = async (key, value) => {
@@ -90,10 +120,15 @@ storeData = async (key, value) => {
 const reducer = (state = initialState, action) => {
   const { type, user, token } = action;
   const { theme, layer } = action;
-  const { isViewing, request } = action;
+  const { isViewing, request, defaultAddress } = action;
   const {messengerGroup, messagesOnGroup} = action;
   const {messages, unread, message} = action;
   const { statusSearch } = action;
+  const { createStatus } = action;
+  const {location, size} = action;
+  const {deviceLocation} = action;
+  const {tempMembers} = action;
+  const {showSettings} = action;
   switch (type) {
     case types.LOGOUT:
       AsyncStorage.clear();
@@ -109,15 +144,25 @@ const reducer = (state = initialState, action) => {
         user,
       };
     case types.SET_THEME:
-      console.log('tertiary', theme.tertiary);
+      console.log('tertiary', theme);
       storeData('primary', theme.primary);
       storeData('secondary', theme.secondary);
       storeData('tertiary', theme.tertiary);
       storeData('fourth', theme.fourth);
+      storeData('gradient', JSON.stringify(theme.gradient));
       Color.setPrimary(theme.primary);
       Color.setSecondary(theme.secondary);
       Color.setTertiary(theme.tertiary);  
       Color.setFourth(theme.fourth);
+      if(theme.primary === '#4CCBA6'){
+        Color.setGradient(['#987BE7', '#b1f2e0', '#4CCBA6'])
+      }else if (theme.primary === '#FFCC00'){
+        Color.setGradient(['#987BE7', '#ffeb96', '#FFCC00'])
+      }else if(theme.primary === '#F88BFF'){
+        Color.setGradient(['#987BE7', '#eb97f0', '#f22bff'])
+      }else{
+        Color.setGradient(['#987BE7', '#9276E6', '#5741D7'])
+      }
       return {
         ...state,
         theme,
@@ -207,6 +252,40 @@ const reducer = (state = initialState, action) => {
         ...state,
         statusSearch,
       };
+    case types.SET_CREATE_STATUS:
+      return {
+        ...state,
+        createStatus,
+      };
+    case types.SET_LOCATION:
+      return {
+        ...state,
+        location,
+      };
+    case types.SET_DEVICE_LOCATION:
+      return {
+        ...state,
+        deviceLocation};
+    case types.SET_DEFAULT_ADDRESS: 
+      return {
+        ...state,
+        defaultAddress
+      };
+    case types.SET_SIZE: 
+      return {
+        ...state,
+        size
+      }
+    case types.SET_TEMP_MEMBERS: 
+      return {
+        ...state,
+        tempMembers
+      }
+    case types.SET_SHOW_SETTINGS: 
+      return {
+        ...state,
+        showSettings
+      }
     default:
       return {...state, nav: state.nav};
   }

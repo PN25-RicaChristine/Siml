@@ -32,7 +32,7 @@ class Menu extends Component{
         </View>
         {/* <ScrollView> */}
         <View>
-          <Swipe navigation={this.props.navigation} header={(value) => {this.headerHandler(value)}} topFloatButton={false} bottomFloatButton={true}></Swipe>
+          <Swipe id={this.props.navigation.state?.params?.id} navigation={this.props.navigation} header={(value) => {this.headerHandler(value)}} topFloatButton={false} bottomFloatButton={true}></Swipe>
         </View>
       {/* </ScrollView> */}
       <Footer layer={1} {...this.props}/>

@@ -7,12 +7,17 @@ import { Spinner } from 'components';
 import Api from 'services/api/index.js';
 import { Routes, Color, Helper, BasicStyles } from 'common';
 import CustomError from 'components/Modal/Error.js';
-import PasswordWithIcon from 'components/InputField/Password.js';
+import PasswordInputWithIconLeft from 'components/InputField/PasswordWithIcon.js';
+import TextInputWithIcon from 'components/InputField/TextInputWithIcon.js';
 import Header from './Header';
 import LinearGradient from 'react-native-linear-gradient'
 import config from 'src/config';
 import { Dimensions } from 'react-native';
-import Button from 'components/Form/Button';
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import {faComments, faArrowRight, faUser} from '@fortawesome/free-solid-svg-icons';
+import SocialLogin from './SocialLogin'
+// import Button from 'components/Form/Button';
+import Button from '../generic/Button.js'
 const width = Math.round(Dimensions.get('window').width);
 class Register extends Component {
   //Screen1 Component
@@ -106,7 +111,7 @@ class Register extends Component {
     const { theme } = this.props.state;
     return (
       <LinearGradient
-        colors={[Color.warning, theme ? theme.primary : Color.primary, theme ? theme.primary : Color.primary]}
+        colors={theme && theme.gradient !== undefined  && theme.gradient !== null ? theme.gradient : Color.gradient}
         locations={[0,0.5,1]}
         start={{ x: 2, y: 0 }}
         end={{ x: 1, y: 1 }}
@@ -115,7 +120,7 @@ class Register extends Component {
           style={Style.ScrollView}
           showsVerticalScrollIndicator={false}>
           <View style={Style.MainContainer}>
-            <Header params={"Register"}></Header>
+            <Header params={"Sign Up"}></Header>
             {
               errorMessage != null && (
                 <View style={{
@@ -133,60 +138,63 @@ class Register extends Component {
             
             
             <View style={Style.TextContainer}>
-              <TextInput
-                style={{
-                  ...BasicStyles.standardFormControl,
-                  marginBottom: 20
-                }}
-                onChangeText={(username) => this.setState({username})}
-                value={this.state.username}
+              <TextInputWithIcon
+                onTyping={(username) => this.setState({username})}
+                value={this.state.email}
                 placeholder={'Username'}
+                style={{width: '90%', borderColor: 'white'}}
+                icon={faUser}
               />
               
-              <TextInput
-                style={{
-                  ...BasicStyles.standardFormControl,
-                  marginBottom: 20
-                }}
-                onChangeText={(email) => this.setState({email})}
+              <TextInputWithIcon
+                onTyping={(email) => this.setState({email})}
                 value={this.state.email}
                 placeholder={'Email Address'}
-                keyboardType={'email-address'}
+                style={{width: '90%', borderColor: 'white'}}
+                icon={faUser}
               />
 
-              <PasswordWithIcon
+              <PasswordInputWithIconLeft
                 onTyping={(input) => this.setState({
                   password: input
                 })}
+                style={{width: '80%', borderColor: 'white'}}
                 placeholder={'Password'}/>
 
               <View style={{
-                marginTop: 20,
+                marginTop: 10,
                 marginBottom: 20,
               }}>
-                <PasswordWithIcon
+                <PasswordInputWithIconLeft
                   onTyping={(input) => this.setState({
                     confirmPassword: input
                   })}
+                  style={{width: '80%', borderColor: 'white'}}
                   placeholder={'Confirm Password'}
                   />
               </View>
-
-              <Button
-                onClick={() => this.submit()}
-                title={'Register'}
+              
+              <Text
+                onPress={() => this.redirect('forgotPasswordStack')}
                 style={{
-                  backgroundColor: Color.warning,
-                  width: '100%',
-                  marginBottom: 20
+                  color: 'white',
+                  width: '50%',
+                  marginLeft: '60%',
+                  textDecorationLine:'underline',
                 }}
-              />
+              >Forgot Password?</Text>
 
-              <View style={{
-                height: 1,
-                backgroundColor: Color.gray
-              }}>
-              </View>
+              
+            
+              <Button content={
+                <View style={{flex: 1, flexDirection: 'row', marginTop: 5}}>
+                  <Text style={{color: 'white', fontSize: 15}}>Sign Up</Text>
+                  <FontAwesomeIcon color={'white'} icon={faArrowRight} style={{marginLeft: 10, marginTop: 1}}/>
+                </View>
+              } styles={[BasicStyles.btnRound, {
+                marginTop: '5%',
+                marginLeft: '50%',
+                width: '50%'}]} redirect={()=> this.submit()}/>
 
               <View style={{
                 justifyContent: 'center',
@@ -195,19 +203,32 @@ class Register extends Component {
                 <Text style={{
                   paddingTop: 10,
                   paddingBottom: 10,
-                  color: Color.gray
-                }}>Have an account Already?</Text>
+                  color: Color.white
+                }}>Or sign up with</Text>
               </View>
 
-              <Button
-                onClick={() => this.redirect('loginStack')}
-                title={'Login Now!'}
-                style={{
-                  backgroundColor: Color.normalGray,
-                  width: '100%',
-                  marginBottom: 100
-                }}
-              />
+              <SocialLogin/>
+              
+              <View style={{
+                width: '100%',
+                alignItems: 'center',
+                marginBottom: '10%'
+              }}>
+                <Text style={{
+                  color: 'white',
+                  fontSize: BasicStyles.standardFontSize
+                }}>Already have an account?
+                  <Text
+                    style={{
+                      textDecorationLine:'underline',
+                      fontWeight:'bold'
+                    }}
+                    onPress={()=> this.props.navigation.navigate('loginStack')}>
+                      Sign In
+                  </Text>
+                </Text>
+              </View>
+
             </View>
           </View>
 

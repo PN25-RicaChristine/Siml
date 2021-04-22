@@ -12,7 +12,11 @@ import config from 'src/config';
 import OtpModal from 'components/Modal/Otp.js';
 import LinearGradient from 'react-native-linear-gradient'
 import { Dimensions } from 'react-native';
-import Button from 'components/Form/Button';
+import PasswordInputWithIconLeft from 'components/InputField/PasswordWithIcon.js';
+import TextInputWithIcon from 'components/InputField/TextInputWithIcon.js';
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import {faComments, faArrowRight, faUser} from '@fortawesome/free-solid-svg-icons';
+import Button from '../generic/Button.js'
 const width = Math.round(Dimensions.get('window').width);
 const height = Math.round(Dimensions.get('window').height);
 class ForgotPassword extends Component {
@@ -157,37 +161,40 @@ class ForgotPassword extends Component {
     const { theme } = this.props.state;
     return (
       <View>
-        <TextInput
-          style={{
-            ...BasicStyles.standardFormControl,
-            marginBottom: 20
-          }}
-          onChangeText={(password) => this.setState({password})}
-          value={this.state.password}
-          placeholder={'New password'}
-          secureTextEntry={true}
-        />
+        <PasswordInputWithIconLeft
+          onTyping={(input) => this.setState({
+            password: input
+          })}
+          style={{width: '80%', borderColor: 'white'}}
+          placeholder={'New Password'}/>
 
-        <TextInput
-          style={{
-            ...BasicStyles.standardFormControl,
-            marginBottom: 20
-          }}
-          onChangeText={(confirmPassword) => this.setState({confirmPassword})}
-          value={this.state.confirmPassword}
-          placeholder={'Confirm new password'}
-          secureTextEntry={true}
-        />
+        <View style={{
+          marginTop: 10,
+          marginBottom: 20,
+        }}>
+          <PasswordInputWithIconLeft
+            onTyping={(input) => this.setState({
+              confirmPassword: input
+            })}
+            style={{width: '80%', borderColor: 'white'}}
+            placeholder={'Confirm Password'}
+            />
+        </View>
 
-        <Button
-          onClick={() => this.resetPassword()}
-          title={'Reset'}
-          style={{
-            backgroundColor: Color.warning,
-            width: '100%',
-            marginBottom: 10
-          }}
-        />
+        <TouchableHighlight  style={[BasicStyles.btnRound, {
+          marginTop: '5%',
+          marginLeft: '50%',
+          width: '50%'}]} 
+          underlayColor={Color.gray}
+          onPress={()=> this.resetPassword()}
+          >
+            <Button content={
+              <View style={{flex: 1, flexDirection: 'row', marginTop: 5}}>
+                <Text style={{color: 'white', fontSize: 15}}>Reset</Text>
+                <FontAwesomeIcon color={'white'} icon={faArrowRight} style={{marginLeft: 10, marginTop: 1}}/>
+              </View>
+            }/>
+        </TouchableHighlight>
       </View>
     );    
   }
@@ -196,26 +203,27 @@ class ForgotPassword extends Component {
     const { theme } = this.props.state;
     return (
       <View>
-        <TextInput
-          style={{
-            ...BasicStyles.standardFormControl,
-            marginBottom: 20
-          }}
-          onChangeText={(email) => this.setState({email})}
+        <TextInputWithIcon
+          onTyping={(email) => this.setState({email})}
           value={this.state.email}
           placeholder={'Email Address'}
-          keyboardType={'email-address'}
+          style={{width: '90%', borderColor: 'white'}}
+          icon={faUser}
         />
-
-        <Button
-          onClick={() => this.requestReset()}
-          title={'Request change'}
-          style={{
-            backgroundColor: Color.warning,
-            width: '100%',
-            marginBottom: 10
-          }}
-        />
+        <TouchableHighlight  style={[BasicStyles.btnRound, {
+          marginTop: '5%',
+          marginLeft: '50%',
+          width: '50%'}]} 
+          underlayColor={Color.gray}
+          onPress={()=> this.requestReset()}
+          >
+            <Button content={
+              <View style={{flex: 1, flexDirection: 'row', marginTop: 5}}>
+                <Text style={{color: 'white', fontSize: 15}}>Send Request</Text>
+                <FontAwesomeIcon color={'white'} icon={faArrowRight} style={{marginLeft: 10, marginTop: 1}}/>
+              </View>
+            }/>
+        </TouchableHighlight>
       </View>
     );
   }
@@ -225,7 +233,7 @@ class ForgotPassword extends Component {
     const { blockedFlag, isOtpModal, isResponseError, responseErrorTitle, responseErrorMessage  } = this.state;
     return (
       <LinearGradient
-        colors={[Color.warning, theme ? theme.primary : Color.primary, theme ? theme.primary : Color.primary]}
+        colors={['#987BE7', '#9276E6', '#5741D7']}
         locations={[0,0.5,1]}
         start={{ x: 2, y: 0 }}
         end={{ x: 1, y: 1 }}
@@ -234,7 +242,7 @@ class ForgotPassword extends Component {
           style={Style.ScrollView}
           showsVerticalScrollIndicator={false}>
             <View style={[Style.MainContainer, {height: height}]}>
-              <Header params={"Request change password"}></Header>
+              <Header params={"Request to Reset Password"}></Header>
               {
                 errorMessage != null && (
                   <View style={{
@@ -256,10 +264,10 @@ class ForgotPassword extends Component {
                       paddingTop: 10,
                       paddingBottom: 10,
                       paddingLeft: 10,
-                      paddingRight: 10
+                      paddingRight: 10,
                   }}>
                     <Text style={[Style.messageText, {
-                      color: Color.black
+                      color: Color.white
                     }]}>{successMessage}</Text>
                   </View>
                 )
@@ -268,25 +276,25 @@ class ForgotPassword extends Component {
               <View style={Style.TextContainer}>
                 { changeStep == 0 && (this._sendRequest()) }
                 { changeStep == 1 && (this._changePassword()) }
-                 <View style={{
-                  justifyContent: 'center',
-                  alignItems: 'center'
+                <View style={{
+                  width: '100%',
+                  alignItems: 'center',
+                  marginTop: '20%'
                 }}>
                   <Text style={{
-                    paddingTop: 10,
-                    paddingBottom: 10,
-                    color: Color.gray
-                  }}>Have an account Already?</Text>
+                    color: 'white',
+                    fontSize: BasicStyles.standardFontSize
+                  }}>Already have an account?
+                    <Text
+                      style={{
+                        textDecorationLine:'underline',
+                        fontWeight:'bold'
+                      }}
+                      onPress={()=> this.props.navigation.navigate('loginStack')}>
+                        Sign In
+                    </Text>
+                  </Text>
                 </View>
-                <Button
-                  onClick={() => this.redirect('loginStack')}
-                  title={'Login Now!'}
-                  style={{
-                    backgroundColor: Color.normalGray,
-                    width: '100%',
-                    marginBottom: 100
-                  }}
-                />
               </View>
             </View>
 

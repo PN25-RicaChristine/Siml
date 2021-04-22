@@ -7,6 +7,8 @@ import Connection from 'modules/connection';
 import {NavigationActions} from 'react-navigation';
 import {BasicStyles, Color} from 'common';
 import {connect} from 'react-redux';
+import { Dimensions } from 'react-native';
+const width = Math.round(Dimensions.get('window').width);
 
 class HeaderOptions extends Component {
   constructor(props) {
@@ -71,13 +73,13 @@ class HeaderOptions extends Component {
   render() {
     const { theme } = this.props.state;
     return (
-      <View style={{flexDirection: 'row', padding: 5}}>
+      <View style={{right: width - 350, position: 'absolute'}}>
         <TouchableOpacity onPress={() => this.onShare()}>
           {/*Donute Button Image */}
           <FontAwesomeIcon
             icon={faShare}
             size={BasicStyles.headerBackIconSize}
-            style={{color: theme ? theme.primary : Color.primary,}}
+            style={{color: Color.gray}}
           />
         </TouchableOpacity>
       </View>
@@ -99,10 +101,29 @@ const TermsAndConditionsStack = createStackNavigator({
   termsAndConditionsScreen: {
     screen: Connection,
     navigationOptions: ({navigation}) => ({
-      title: null,
+      title: 'Connections',
       headerRight: <HeaderOptionsConnect navigationProps={navigation} />,
-      ...BasicStyles.drawerHeader
-      
+      ...{
+        headerStyle: {
+          shadowColor: 'transparent',
+          elevation: 0,
+          borderBottomWidth: 0,
+          justifyContent: 'center',
+          alignItems: 'center',
+          fontSize: 12,
+          width: width,
+          marginLeft: 60
+        },
+        headerTitleContainerStyle: {
+          backgroundColor: Color.white,
+          justifyContent: 'center',
+          alignItems: 'center',
+          paddingRight: 64
+        },
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },  
+      }
     }),
   },
 });

@@ -39,15 +39,27 @@ class Display extends Component {
   selectHandler = (index) => {
     let _theme = dummyThemeData[index].colors
     const {setTheme} = this.props;
+    let temGrad = []
+    if(_theme[0] === '#4CCBA6'){
+      temGrad =['#987BE7', '#b1f2e0', '#4CCBA6']
+    }else if (_theme[0] === '#FFCC00'){
+      temGrad =['#987BE7', '#ffeb96', '#FFCC00']
+    }else if(_theme[0] === '#F88BFF'){
+      temGrad =['#987BE7', '#eb97f0', '#f22bff']
+    }else{
+      temGrad =['#987BE7', '#9276E6', '#5741D7']
+    }
     setTheme({
       primary: _theme[0],
       secondary: _theme[1],
       tertiary: _theme[2],
-      fourth: _theme[3]
+      fourth: _theme[3],
+      gradient: temGrad
     });
     console.log(_theme)
     this.setState({selectedTile: index});
   };
+  
 
   displayThemeTiles = () => {
     return dummyThemeData.map((data, index) => {
@@ -60,6 +72,7 @@ class Display extends Component {
           themeTitle={data.title}
           colors={data.details}
           circles={data.colors}
+          theme = {this.props.state.theme}
         />
       );
     });

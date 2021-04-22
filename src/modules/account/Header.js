@@ -10,14 +10,17 @@ export default  class Header extends Component{
           <Image source={require('assets/new2.png')} style={Style.LogoSize}/>
         </View>
         <View style={{
-          alignItems: 'center',
-          justifyContent: 'center'
+          alignItems:'flex-start',
+          justifyContent:'flex-start',
+          marginLeft: 30
         }}>
           <Text style={{
             paddingTop: 50,
             paddingBottom: 20,
-            color:'white'
-          }}>{this.props.params} to {Helper.APP_NAME_BASIC}</Text>
+            color:'white',
+            fontWeight:'bold',
+            fontSize: 20
+          }}>{this.props.params}</Text>
         </View>
       </View>
     );

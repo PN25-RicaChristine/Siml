@@ -6,16 +6,16 @@ export default {
   Tab: {
     width: '100%',
     flexDirection: 'row',
-    borderWidth: 0.3,
+    borderWidth: 1,
     height: 50,
     fontSize: 20,
-    borderColor: '#828282'
+    borderColor: Color.primary
   },
   MenuClicked: {
     width: '50%',
     textAlign: 'center',
     alignItems: 'center',
-    backgroundColor: '#5842D7',
+    backgroundColor: Color.primary,
   },
   Menu: {
     width: '50%',
@@ -24,17 +24,16 @@ export default {
   },
   Information: {
     width: '50%',
-    borderLeftWidth: 1,
     textAlign: 'center',
     alignItems: 'center',
-    borderColor: '#828282',
+    borderColor: Color.primary,
   },
   InformationClicked: {
     width: '50%',
     borderLeftWidth: 1,
     textAlign: 'center',
     alignItems: 'center',
-    borderColor: '#828282',
-    backgroundColor: '#5842D7'
+    borderColor: Color.primary,
+    backgroundColor: Color.primary
   },
 }

@@ -15,11 +15,14 @@ class SocialLogin extends Component{
     return (
       <View style={[Style.MainContainer, {flex: 1, flexDirection: 'row'}]}>
         {/* <View style={Style.TextContainer}> */}
-          <TouchableHighlight style={[BasicStyles.btnRound, {backgroundColor: 'white', width: 50, marginRight: -60}]}>
+          <TouchableHighlight style={[BasicStyles.btnRound, {backgroundColor: 'white', width: 50}]}>
               <FontAwesomeIcon size={30} color={Color.primary} icon={['fab', 'facebook-f']}/>
           </TouchableHighlight>
-          <TouchableHighlight style={[BasicStyles.btnRound, {backgroundColor: 'white', width: 50}]}>
+          <TouchableHighlight style={[BasicStyles.btnRound, {backgroundColor: 'white', width: 50, marginLeft: -20, marginRight: -20}]}>
               <FontAwesomeIcon size={30} color={Color.primary} icon={['fab', 'google-plus-g']}/>
+          </TouchableHighlight>
+          <TouchableHighlight style={[BasicStyles.btnRound, {backgroundColor: 'white', width: 50}]}>
+              <FontAwesomeIcon size={30} color={Color.primary} icon={['fab', 'twitter']}/>
           </TouchableHighlight>
         {/* </View> */}
       </View>

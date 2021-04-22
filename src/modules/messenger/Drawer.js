@@ -3,9 +3,9 @@ import {View, TouchableOpacity, Text} from 'react-native';
 import {createStackNavigator} from 'react-navigation-stack';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faChevronLeft, faBars} from '@fortawesome/free-solid-svg-icons';
-import Screen from 'modules/messenger/Messages.js';
+import Screen from 'modules/messenger/index.js';
 import {NavigationActions} from 'react-navigation';
-import {BasicStyles} from 'common';
+import {BasicStyles, Color} from 'common';
 import {connect} from 'react-redux';
 
 class HeaderOptions extends Component {
@@ -19,14 +19,6 @@ class HeaderOptions extends Component {
     const { theme } = this.props.state;
     return (
       <View style={{flexDirection: 'row'}}>
-        <TouchableOpacity onPress={this.back.bind(this)}>
-          {/*Donute Button Image */}
-          <FontAwesomeIcon
-            icon={faChevronLeft}
-            size={BasicStyles.headerBackIconSize}
-            style={{color: theme ? theme.primary : Color.primary }}
-          />
-        </TouchableOpacity>
       </View>
     );
   }
@@ -40,13 +32,13 @@ const mapDispatchToProps = (dispatch) => {
 };
 let HeaderOptionsConnect  = connect(mapStateToProps, mapDispatchToProps)(HeaderOptions);
 
-const TermsAndConditionsStack = createStackNavigator({
-  termsAndConditionsScreen: {
+const MainMessageStack = createStackNavigator({
+  mainMessageScreen: {
     screen: Screen,
     navigationOptions: ({navigation}) => ({
       title: 'Messages',
       headerLeft: <HeaderOptionsConnect navigationProps={navigation} />,
-      ...BasicStyles.headerDrawerStyle
+      ...BasicStyles.drawerHeader1
     }),
   },
 });
@@ -54,4 +46,4 @@ const TermsAndConditionsStack = createStackNavigator({
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(TermsAndConditionsStack);
+)(MainMessageStack);

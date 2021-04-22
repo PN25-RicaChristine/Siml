@@ -19,8 +19,12 @@ import OtpModal from 'components/Modal/Otp.js';
 import LinearGradient from 'react-native-linear-gradient'
 import SocialLogin from './SocialLogin'
 import {Notifications, NotificationAction, NotificationCategory} from 'react-native-notifications';
+import PasswordInputWithIconLeft from 'components/InputField/PasswordWithIcon.js';
+import TextInputWithIcon from 'components/InputField/TextInputWithIcon.js';
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import {faComments, faArrowRight, faUser} from '@fortawesome/free-solid-svg-icons';
+import Button from '../generic/Button.js'
 import { Dimensions } from 'react-native';
-import Button from 'components/Form/Button';
 const width = Math.round(Dimensions.get('window').width);
 class Login extends Component {
   //Screen1 Component
@@ -44,9 +48,10 @@ class Login extends Component {
   async componentDidMount(){
     this.getTheme()
     if(config.versionChecker == 'store'){
-      this.setState({isLoading: true})
+      // this.setState({isLoading: true})
       SystemVersion.checkVersion(response => {
-        this.setState({isLoading: false})
+        // this.setState({isLoading: false})
+        console.log(response);
         if(response == true){
           this.getData();
         }
@@ -67,13 +72,15 @@ class Login extends Component {
       const secondary = await AsyncStorage.getItem(Helper.APP_NAME + 'secondary');
       const tertiary = await AsyncStorage.getItem(Helper.APP_NAME + 'tertiary');
       const fourth = await AsyncStorage.getItem(Helper.APP_NAME + 'fourth');
+      const gradient = await AsyncStorage.getItem(Helper.APP_NAME + 'gradient');
       if(primary != null && secondary != null && tertiary != null) {
         const { setTheme } = this.props;
         setTheme({
           primary: primary,
           secondary: secondary,
           tertiary: tertiary,
-          fourth: fourth
+          fourth: fourth,
+          gradient: JSON.parse(gradient)
         })
       }
     } catch (e) {
@@ -390,18 +397,20 @@ class Login extends Component {
     const { isLoading, error, isResponseError } = this.state;
     const {  blockedFlag, isOtpModal } = this.state;
     const { theme } = this.props.state;
+    // console.log('[THEME]', theme);
     return (
       <LinearGradient
-        colors={[Color.warning, theme ? theme.primary : Color.primary, theme ? theme.primary : Color.primary]}
+        colors={theme && theme.gradient !== undefined  && theme.gradient !== null ? theme.gradient : Color.gradient}
         locations={[0,0.5,1]}
         start={{ x: 2, y: 0 }}
         end={{ x: 1, y: 1 }}
+        style={{height: '100%'}}
         >
         <ScrollView
           style={Style.ScrollView}
           showsVerticalScrollIndicator={false}>
           <View style={[Style.MainContainer]}>
-            <Header params={"Login"}></Header>
+            <Header params={"Sign In"}></Header>
 
             {error > 0 ? <View style={Style.messageContainer}>
               {error == 1 ? (
@@ -414,56 +423,34 @@ class Login extends Component {
             </View> : null}
             
             <View style={Style.TextContainer}>
-
-              <TextInput
-                style={{
-                  ...BasicStyles.standardFormControl,
-                  marginBottom: 20
-                }}
-                onChangeText={(username) => this.setState({username})}
-                value={this.state.username}
-                placeholder={'Username or Email'}
+                
+            <TextInputWithIcon
+                onTyping={(username) => this.setState({username})}
+                value={this.state.email}
+                placeholder={'Username'}
+                style={{width: '90%', borderColor: 'white'}}
+                icon={faUser}
               />
 
-              <PasswordWithIcon onTyping={(input) => this.setState({
-                password: input
-              })}/>
+              <PasswordInputWithIconLeft
+                onTyping={(input) => this.setState({
+                  password: input
+                })}
+                style={{width: '80%', borderColor: 'white'}}
+                placeholder={'Password'}
+                />
 
 
-              <Button
-                onClick={() => this.submit()}
-                title={'Login'}
-                style={{
-                  backgroundColor: Color.warning,
-                  width: '100%',
-                  marginBottom: 20,
-                  marginTop: 20
-                }}
-              />
+              <Button content={
+                <View style={{flex: 1, flexDirection: 'row', marginTop: 5}}>
+                  <Text style={{color: 'white', fontSize: 15}}>Sign In</Text>
+                  <FontAwesomeIcon color={'white'} icon={faArrowRight} style={{marginLeft: 10, marginTop: 1}}/>
+                </View>
+              } styles={[BasicStyles.btnRound, {
+                marginTop: '5%',
+                marginLeft: '50%',
+                width: '50%'}]} redirect={()=> this.submit()}/>
               
-
-              <SocialLogin/>
-              
-
-              <Button
-                onClick={() => this.redirect('forgotPasswordStack')}
-                title={'Forgot your Password?'}
-                style={{
-                  backgroundColor: 'transparent',
-                  width: '100%',
-                  marginBottom: 20
-                }}
-                textStyle={{
-                  color: Color.white
-                }}
-              />
-              
-              
-              <View style={{
-                height: 1,
-                backgroundColor: Color.gray
-              }}>
-              </View>
 
               <View style={{
                 justifyContent: 'center',
@@ -472,20 +459,31 @@ class Login extends Component {
                 <Text style={{
                   paddingTop: 10,
                   paddingBottom: 10,
-                  color: Color.gray
-                }}>Don't have an account?</Text>
+                  color: Color.white
+                }}>Or sign in with</Text>
               </View>
-              
-              <Button
-                onClick={() => this.redirect('registerStack')}
-                title={'Register Now!'}
-                style={{
-                  backgroundColor: Color.normalGray,
-                  width: '100%',
-                  marginBottom: 100
-                }}
-              />
 
+              <SocialLogin/>
+              
+              <View style={{
+                width: '100%',
+                alignItems: 'center',
+                marginBottom: '10%'
+              }}>
+                <Text style={{
+                  color: 'white',
+                  fontSize: BasicStyles.standardFontSize
+                }}>Dont't have an account?
+                  <Text
+                    style={{
+                      textDecorationLine:'underline',
+                      fontWeight:'bold'
+                    }}
+                    onPress={()=> this.props.navigation.navigate('registerStack')}>
+                      Sign Up
+                  </Text>
+                </Text>
+              </View>
 
             </View>
           </View>

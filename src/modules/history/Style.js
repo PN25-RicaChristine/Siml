@@ -13,10 +13,5 @@ export default {
   },
   footerIcon: {
     marginTop: Platform.OS == 'ios' ? 30 : 0
-  },
-  sliderContainer: {
-    width: '90%',
-    marginLeft: '5%',
-    marginRight: '5%'
-  },
+  }
 }

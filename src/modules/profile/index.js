@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Image, Text, TouchableOpacity, TextInput, ScrollView } from 'react-native';
+import { View, Image, Text, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
 import { Routes, Color, Helper, BasicStyles } from 'common';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCheckCircle, faEdit } from '@fortawesome/free-solid-svg-icons';
@@ -82,6 +82,17 @@ class Profile extends Component {
     if (user === null) {
       return
     }
+    if(this.validation() === true) {
+      Alert.alert(
+        "Opps",
+        "All fields are required!",
+        [
+          { text: "OK"}
+        ],
+        { cancelable: false }
+      );
+      return
+    }
     let parameter = {
       id: this.state.id,
       account_id: user.id,
@@ -92,6 +103,26 @@ class Profile extends Component {
     this.setState({ isLoading: true })
     Api.request(Routes.accountInformationUpdate, parameter, response => {
       this.setState({ isLoading: false })
+    });
+  }
+
+  reloadProfile = () => {
+    const { user, token } = this.props.state;
+    if (user == null) {
+      return
+    }
+    let parameter = {
+      condition: [{
+        value: user.id,
+        clause: '=',
+        column: 'id'
+      }]
+    }
+    this.setState({ isLoading: true })
+    Api.request(Routes.accountRetrieve, parameter, response => {
+      this.setState({ isLoading: false })
+      const { updateUser } = this.props;
+      updateUser(response.data[0])
     });
   }
 
@@ -108,10 +139,20 @@ class Profile extends Component {
     this.setState({ isLoading: true })
     Api.request(Routes.accountProfileCreate, parameter, response => {
       this.setState({ isLoading: false })
-      this.retrieve();
+      this.reloadProfile();
     }, error => {
       console.log(error)
     });
+  }
+
+  validation = () => {
+    const { firstName, middleName, lastName, cellularNumber } = this.state;
+    if(firstName === null || middleName === null || lastName === null || cellularNumber == null || 
+      firstName === '' || middleName === '' || lastName === '' || cellularNumber == '') {
+        return true;
+    } else {
+      return false;
+    }
   }
 
   render() {
@@ -122,7 +163,7 @@ class Profile extends Component {
           backgroundColor: Color.containerBackground
         }]}>
           {this.state.isLoading ? <Spinner mode="overlay" /> : null}
-          <View style={{ borderBottomWidth: .3, borderColor: '#555555' }}>
+          <View style={{ borderBottomWidth: 1, borderColor: Color.primary }}>
             <View style={Style.TopView}>
               <TouchableOpacity
                 style={{
@@ -147,6 +188,8 @@ class Profile extends Component {
                   )
                 }
                 <View style={{
+                  borderColor: Color.primary,
+                  borderWidth: 1,
                   height: 50,
                   width: 50,
                   borderRadius: 100,
@@ -158,16 +201,6 @@ class Profile extends Component {
                   justifyContent: 'center',
                   alignItems: 'center'
                 }}>
-                  <View style={{
-                    height: 35,
-                    width: 35,
-                    borderRadius: 100,
-                    borderWidth: 2,
-                    borderColor: Color.primary,
-                    backgroundColor: 'white',
-                    justifyContent: 'center',
-                    alignItems: 'center'
-                  }}>
                     <FontAwesomeIcon style={{
                       borderColor: Color.primary
                     }}
@@ -175,25 +208,28 @@ class Profile extends Component {
                       size={20}
                       color={Color.primary}
                     />
-                  </View>
                 </View>
               </TouchableOpacity>
             </View>
             <View style={{
               width: '100%'
             }}>
-              <Text style={{
-                textAlign: 'center',
-                color: '#333333'
-              }}>Tap to edit profile</Text>
+              <TouchableOpacity onPress={() => {
+                this.setState({ isImageUpload: true })
+              }}>
+                <Text style={{
+                  textAlign: 'center',
+                  color: '#333333'
+                }}>Tap to edit profile</Text>
+              </TouchableOpacity>
             </View>
             <View style={Style.BottomView}>
-              <FontAwesomeIcon style={{ marginRight: 5 }} icon={faCheckCircle} size={20} color={Color.blue} />
+              <FontAwesomeIcon style={{ marginRight: 5 }} icon={faCheckCircle} size={20} color={Color.primary} />
               <Text style={{
                 textAlign: 'center',
                 fontWeight: 'bold',
                 fontSize: 18
-              }}>Lalaine Garrido</Text>
+              }}>{this.state.firstName && this.state.middleName && this.state.lastName && this.state.firstName + ' ' + this.state.middleName  +' ' + this.state.lastName}</Text>
             </View>
           </View>
           <View style={{
@@ -244,7 +280,8 @@ class Profile extends Component {
         <View style={{
             padding: 25,
             textAlign: 'center',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            paddingTop: 10
           }}>
           <CustomizedButton onClick={() => {this.update()}} title={'Update'}></CustomizedButton>
           </View>
@@ -254,6 +291,15 @@ class Profile extends Component {
 }
 const mapStateToProps = state => ({ state: state });
 
+
+const mapDispatchToProps = dispatch => {
+  const { actions } = require('@redux');
+  return {
+    updateUser: (user) => dispatch(actions.updateUser(user)),
+  };
+};
+
 export default connect(
-  mapStateToProps
+  mapStateToProps,
+  mapDispatchToProps
 )(Profile);

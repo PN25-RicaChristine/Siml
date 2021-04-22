@@ -20,7 +20,9 @@ class Button extends Component{
         bottom: 10,
         width: '100%',
         alignItems:'center',
-        justifyContent:'center'}}>
+        justifyContent:'center',
+        ...this.props.style
+      }}>
         <TouchableOpacity
           style={{
             alignItems:'center',

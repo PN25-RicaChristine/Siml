@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Style from './Style.js';
-import { View, TouchableHighlight, Text, ScrollView, FlatList, Platform} from 'react-native';
+import { View, TouchableHighlight, Text, ScrollView, FlatList, Platform, Image } from 'react-native';
 import { Routes, Color, Helper, BasicStyles } from 'common';
 import { Spinner, Empty, UserImage } from 'components';
 import Api from 'services/api/index.js';
@@ -9,37 +9,70 @@ import { connect } from 'react-redux';
 import Config from 'src/config.js';
 import CommonRequest from 'services/CommonRequest.js';
 import { Dimensions } from 'react-native';
+import Group from 'modules/generic/GroupUsers.js';
+import Footer from 'modules/generic/Footer';
 const height = Math.round(Dimensions.get('window').height);
-class Groups extends Component{
-  constructor(props){
+
+class Groups extends Component {
+  constructor(props) {
     super(props);
     this.state = {
       isLoading: false,
       selected: null,
-      data: null
+      data: null,
+      connections: []
     }
   }
 
-  componentDidMount(){
-    console.log('mmmmmmmmmmesages modulesssssssadfasdfasdfasdfasdfasdfsssssssssss')
+  componentDidMount() {
     const { user } = this.props.state;
-    if(user != null){
+    if (user != null) {
       this.retrieve();
     }
   }
 
-  retrieve = () => {
-    const { user } = this.props.state;
-    if(user == null){
+  retrieveConnections() {
+    const { user } = this.props.state
+    if (user == null) {
       return
     }
-    this.setState({isLoading: true});
+    let parameter = {
+      condition: [{
+        value: user.id,
+        column: 'account_id',
+        clause: '='
+      }, {
+        value: user.id,
+        column: 'account',
+        clause: 'or'
+      }, {
+        clause: "=",
+        column: "status",
+        value: "accepted"
+      }],
+      offset: 0
+    }
+    this.setState({ isLoading: true })
+    Api.request(Routes.circleRetrieve, parameter, response => {
+      this.setState({ isLoading: false })
+      if (response.data.length > 0) {
+        this.setState({ connections: response.data })
+      }
+    });
+  }
+
+  retrieve = () => {
+    this.retrieveConnections();
+    const { user } = this.props.state;
+    if (user == null) {
+      return
+    }
+    this.setState({ isLoading: true });
     CommonRequest.retrieveMessengerGroups(user, response => {
-      console.log('^^^^^^^^^^^^^^^^^^^^^^^^^', response.data)
-      this.setState({isLoading: false, data: response.data});
+      this.setState({ isLoading: false, data: response.data });
       const { setMessenger } = this.props;
       const { messenger } = this.props.state;
-      if(response.data !== null){
+      if (response.data !== null) {
         var counter = 0
         for (var i = 0; i < response.data.length; i++) {
           let item = response.data[i]
@@ -50,14 +83,14 @@ class Groups extends Component{
     })
   }
 
-  updateLastMessageStatus = (item)  => {
-    if(parseInt(item.total_unread_messages) > 0){
+  updateLastMessageStatus = (item) => {
+    if (parseInt(item.total_unread_messages) > 0) {
       let parameter = {
         messenger_group_id: item.id
       }
       CommonRequest.updateMessageStatus(parameter, response => {
         this.state.data.map((dataItem) => {
-          if(item.id === dataItem.id){
+          if (item.id === dataItem.id) {
             const { messenger } = this.props.state;
             const { setMessenger } = this.props;
             let unread = messenger.unread - parseInt(item.total_unread_messages)
@@ -84,26 +117,47 @@ class Groups extends Component{
   }
 
   _card = (item) => {
+    const { user } = this.props.state;
     return (
       <View>
         <TouchableHighlight
-          onPress={() => {this.viewMessages(item)}}
+          onPress={() => { this.viewMessages(item) }}
           underlayColor={Color.lightGray}
           style={{
             paddingTop: 10,
             paddingBottom: 10
           }}
-          >
+        >
           <View>
-            <View style={{flexDirection: 'row', marginTop: 5, paddingLeft: 10, paddingRight: 10}}>
+            <View style={{
+              position: 'absolute',
+              height: '100%',
+              width: '15%',
+              left: 20
+            }}>
+              {
+                user.account_profile && user.account_profile.url && (
+                  <Image
+                    source={user && user.account_profile && user.account_profile.url ? { uri: Config.BACKEND_URL + user.account_profile.url } : require('assets/logo.png')}
+                    style={[BasicStyles.profileImageSize, {
+                      height: '100%',
+                      width: '100%',
+                      borderRadius: 100,
+                      borderColor: Color.primary,
+                      borderWidth: 2
+                    }]} />
+                )
+              }
+            </View>
+            <View style={{ flexDirection: 'row', marginTop: 5, paddingLeft: 10, paddingRight: 10 }}>
               <View style={{
-                paddingLeft: 10,
+                paddingLeft: '23%',
                 width: '100%',
                 flexDirection: 'row'
               }}>
                 <Text style={{
-                  color: Color.primary,
                   lineHeight: 30,
+                  fontWeight: 'bold'
                 }}>{item.title}</Text>
                 {
                   parseInt(item.total_unread_messages) > 0 && Platform.OS == 'android' && (
@@ -140,15 +194,21 @@ class Groups extends Component{
                 }
               </View>
             </View>
+            <Text style={{
+              lineHeight: 30,
+              paddingLeft: '23%',
+              width: '100%',
+              fontStyle: 'italic'
+            }}>Message: Last message here</Text>
           </View>
         </TouchableHighlight>
       </View>
     );
   }
-  
+
   FlatListItemSeparator = () => {
     return (
-      <View style={Style.Separator}/>
+      <View style={Style.Separator} />
     );
   };
 
@@ -184,26 +244,38 @@ class Groups extends Component{
   render() {
     const { isLoading, data } = this.state;
     return (
-      <ScrollView 
-        style={Style.ScrollViewGroup}
-        onScroll={(event) => {
-          if(event.nativeEvent.contentOffset.y <= 0) {
-            if(this.state.isLoading == false){
-              this.retrieve()
+      <View style={{ flex: 1 }}>
+        { this.state.connections.length > 0 && (
+          <View style={{
+            borderBottomColor: Color.primary,
+            borderBottomWidth: 1,
+            paddingBottom: 10,
+            margin: '2%',
+          }}>
+            <Group navigation={this.props.navigation} style={{ marginLeft: 13 }} size={60} data={this.state.connections} />
+          </View>
+        )}
+        <ScrollView
+          style={Style.ScrollViewGroup}
+          onScroll={(event) => {
+            if (event.nativeEvent.contentOffset.y <= 0) {
+              if (this.state.isLoading == false) {
+                this.retrieve()
+              }
             }
-          }
-        }}
+          }}
         >
-        <View stle={{
-          flexDirection: 'row',
-          width: '100%',
-          minHeight: height
-        }}>
-          {this._flatList()}
-        </View>
-        {data == null && (<Empty refresh={true} onRefresh={() => this.retrieve()}/>)}
-        {isLoading ? <Spinner mode="overlay"/> : null }
-      </ScrollView>
+          <View stle={{
+            flexDirection: 'row',
+            width: '100%'
+          }}>
+            {this._flatList()}
+          </View>
+          {data == null && (<Empty refresh={true} onRefresh={() => this.retrieve()} />)}
+          {isLoading ? <Spinner mode="overlay" /> : null}
+        </ScrollView>
+        <Footer layer={1} {...this.props} />
+      </View>
     );
   }
 }

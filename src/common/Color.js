@@ -1,7 +1,9 @@
+
 let primary = '#5842D7'
 let secondary = '#FFCC00'
 let tertiary = '#4CCBA6'
 let fourth = '#F88BFF'
+let gradient = ['#987BE7', '#9276E6', '#5741D7']
 export default {
   primaryDark: '#cae166',
   primary: primary,
@@ -16,10 +18,12 @@ export default {
   black: '#000',
   success: '#4BB543',
   goldenYellow: '#FFDF00',
+  orange: '#F89551', //logo color
   tertiary: tertiary,
-  blue: '#2F80ED',
+  blue: '#1B6F9C', //logo color
   containerBackground: '#fff',
   fourth: fourth,
+  gradient: gradient,
   setPrimary(color){
     this.primary = color
   },
@@ -31,5 +35,8 @@ export default {
   },
   setFourth(color){
     fourth = color
+  },
+  setGradient(colors){
+    gradient = colors
   }
 }

@@ -32,9 +32,6 @@ export default {
     fontWeight: 'bold',
     fontSize: 15
   },
-  MainContainer: {
-    height: height
-  },
   circleImage: {
     width: 80,
     height: 80,
